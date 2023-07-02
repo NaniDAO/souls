@@ -1,2 +1,6 @@
-SoulsTest:testSetSoulERC1155(uint256,string) (runs: 1000, μ: 118266, ~: 124093)
-SoulsTest:testSetSoulERC721(uint256,string) (runs: 1000, μ: 139189, ~: 145594)
+SoulsTest:testSetSoulERC1155(uint256,string) (runs: 1000, μ: 117965, ~: 123780)
+SoulsTest:testSetSoulERC1155IncorrectOwner(uint256,string) (runs: 1000, μ: 54018, ~: 54067)
+SoulsTest:testSetSoulERC721(uint256,string) (runs: 1000, μ: 139153, ~: 145316)
+SoulsTest:testSetSoulERC721IncorrectOwner(uint256,string) (runs: 1000, μ: 73531, ~: 73579)
+SoulsTest:testSetSoulNonExistentERC1155(uint256,string) (runs: 1000, μ: 19613, ~: 19670)
+SoulsTest:testSetSoulNonExistentERC721(uint256,string) (runs: 1000, μ: 19526, ~: 19587)

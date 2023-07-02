@@ -1,12 +1,21 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 pragma solidity ^0.8.15;
 
-import {ERC721} from "@base/tokens/ERC721/ERC721.sol";
-import {ERC1155} from "@base/tokens/ERC1155/ERC1155.sol";
-
 enum TokenStandard {
     ERC721,
     ERC1155
+}
+
+abstract contract ERC721 {
+    mapping(uint256 => address) internal _ownerOf;
+
+    function ownerOf(uint256 id) public view virtual returns (address owner) {
+        require((owner = _ownerOf[id]) != address(0), "NOT_MINTED");
+    }
+}
+
+abstract contract ERC1155 {
+    mapping(address => mapping(uint256 => uint256)) public balanceOf;
 }
 
 /**
@@ -25,11 +34,6 @@ contract Souls {
     error NotOwner();
 
     /**
-     * @dev Custom error thrown when an invalid standard is provided
-     */
-    error InvalidStandard();
-
-    /**
      * @dev Mapping to store metadata for each token
      */
     mapping(address => mapping(uint256 => string)) public metadata;
@@ -42,10 +46,6 @@ contract Souls {
      * @param _standard The standard of the token (721 for ERC721, 1155 for ERC1155)
      */
     function set(address _address, uint256 _tokenId, string memory _data, TokenStandard _standard) external {
-        if (_standard != TokenStandard.ERC721 && _standard != TokenStandard.ERC1155) {
-            revert InvalidStandard();
-        }
-
         if (_standard == TokenStandard.ERC721) {
             if (ERC721(_address).ownerOf(_tokenId) != msg.sender) revert NotOwner();
         } else if (_standard == TokenStandard.ERC1155) {

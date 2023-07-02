@@ -1,1 +1,2 @@
-GreeterTest:testSetGm() (gas: 107402)
+SoulsTest:testSetSoulERC1155(uint256,string) (runs: 1000, μ: 118266, ~: 124093)
+SoulsTest:testSetSoulERC721(uint256,string) (runs: 1000, μ: 139189, ~: 145594)

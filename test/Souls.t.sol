@@ -35,7 +35,7 @@ contract SoulsTest is Test {
         //vm.expectEmit(true, true, true, true);
         emit Soul(alice, Souls(erc721), tokenId, soulData);
         vm.prank(alice);
-        souls.set(Souls(erc721), tokenId, soulData, true);
+        souls.set(Souls(erc721), tokenId, soulData);
 
         // Check the soul data
         string memory result = souls.meta(Souls(erc721), tokenId);
@@ -49,7 +49,7 @@ contract SoulsTest is Test {
         // Attempt to set the soul of the token with incorrect owner
         vm.expectRevert(NotOwner.selector);
         vm.prank(alice);
-        souls.set(Souls(erc721), tokenId, soulData, true);
+        souls.set(Souls(erc721), tokenId, soulData);
     }
 
     // Test setting the soul for an ERC1155 token.
@@ -61,7 +61,7 @@ contract SoulsTest is Test {
         vm.expectEmit(true, true, true, true);
         emit Soul(alice, Souls(erc1155), tokenId, soulData);
         vm.prank(alice);
-        souls.set(Souls(erc1155), tokenId, soulData, false);
+        souls.set(Souls(erc1155), tokenId, soulData);
 
         // Check the soul data
         string memory result = souls.meta(Souls(erc1155), tokenId);
@@ -77,7 +77,7 @@ contract SoulsTest is Test {
         vm.expectRevert(NotOwner.selector);
         emit Soul(alice, Souls(erc1155), tokenId, soulData);
         vm.prank(alice);
-        souls.set(Souls(erc1155), tokenId, soulData, false);
+        souls.set(Souls(erc1155), tokenId, soulData);
     }
     
     // Test setting the soul with an invalid token standard
@@ -90,7 +90,7 @@ contract SoulsTest is Test {
         vm.expectRevert();
         emit Soul(alice, Souls(fake721), tokenId, soulData);
         vm.prank(alice);
-        souls.set(Souls(fake721), tokenId, soulData, true);
+        souls.set(Souls(fake721), tokenId, soulData);
     }
 
     // Test setting the soul for a non-existent ERC1155 token:
@@ -102,6 +102,6 @@ contract SoulsTest is Test {
         vm.expectRevert();
         emit Soul(alice, Souls(fake1155), tokenId, soulData);
         vm.prank(alice);
-        souls.set(Souls(fake1155), tokenId, soulData, false);
+        souls.set(Souls(fake1155), tokenId, soulData);
     }
 }

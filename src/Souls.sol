@@ -11,9 +11,13 @@ contract Souls {
 
     mapping(Souls tkn => mapping(uint id => string)) public meta;
 
-    function set(Souls tkn, uint id, string calldata data, bool nft) external payable {
-        if (nft) { if (msg.sender != tkn.ownerOf(id)) revert NotOwner(); 
-        } else { if (tkn.balanceOf(msg.sender, id) == 0) revert NotOwner(); }
+    function set(Souls tkn, uint id, string calldata data) external payable {
+        try  tkn.ownerOf(id) returns (address owner) {
+            if (msg.sender != owner) revert NotOwner();
+        } catch {
+            if (tkn.balanceOf(msg.sender, id) == 0) revert NotOwner();
+        }
+        
         emit Soul(msg.sender, tkn, id, meta[tkn][id] = data);
     }
 

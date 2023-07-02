@@ -1,22 +1,10 @@
-<img align="right" width="150" height="150" top="100" src="./assets/readme.jpg">
+<img align="right" width="150" height="150" top="100" src="./assets/logo.webp">
 
-# Kplate • [![ci](https://github.com/kalidao/kplate/actions/workflows/ci.yml/badge.svg)](https://github.com/kalidao/kplate/actions/workflows/ci.yml) ![license](https://img.shields.io/github/license/kalidao/kplate?label=license) ![solidity](https://img.shields.io/badge/solidity-^0.8.4-lightgrey)
+# Souls • [![ci](https://github.com/NaniDAO/souls/actions/workflows/ci.yml/badge.svg)](https://github.com/NaniDAO/souls/actions/workflows/ci.yml) ![license](https://img.shields.io/github/license/NaniDAO/souls?label=license) ![solidity](https://img.shields.io/badge/solidity-^0.8.4-lightgrey)
 
-A **Clean**, **Robust** Template for Foundry Projects.
+A contract for managing "souls" associated with NFTs.
 
 ## Getting Started
-
-Click [`use this template`](https://github.com/kalidao/kplate/generate) to create a new repository with this repo as the initial state.
-
-Or, if your repo already exists, run:
-
-```sh
-forge init --template https://github.com/kalidao/kplate
-git submodule update --init --recursive
-forge install
-```
-
-Run `./utils/rename.sh` to rename all instances of `kplate` with the name of your project/repository.
 
 ## Blueprint
 
@@ -24,12 +12,13 @@ Run `./utils/rename.sh` to rename all instances of `kplate` with the name of you
 lib
 ├─ forge-std — https://github.com/foundry-rs/forge-std
 ├─ solbase — https://github.com/Sol-DAO/solbase
+└─ solmate — https://github.com/Rari-Capital/solmate
 scripts
 ├─ Deploy.s.sol — Simple Deployment Script
 src
-├─ Greeter — A Minimal Greeter Contract
+└─ Souls.sol — Contains the logic for read and write the "soul" associated with NFT. 
 test
-└─ Greeter.t — Exhaustive Tests
+└─ Souls.t — Exhaustive Tests
 ```
 
 ## Development
@@ -102,7 +91,7 @@ For a full list of configuration options, see the Foundry [configuration documen
 
 ## License
 
-[MIT](https://github.com/kalidao/kplate/blob/master/LICENSE)
+[MIT](https://github.com/NaniDAO/souls/blob/master/LICENSE)
 
 ## Acknowledgements
 

@@ -1,5 +1,6 @@
 /* Interface */
 #define function set(address, uint256, string) nonpayable returns ()
+#define function get(address, uint256) nonpayable returns (string)
 #define function ownerOf(uint256) view returns (address)
 #define function balanceOf(address,uint256) view returns (uint256)
 
@@ -8,14 +9,57 @@
 #define constant OWNER_LOCATION = FREE_STORAGE_POINTER()
 #define constant BALANCE_LOCATION = FREE_STORAGE_POINTER()
 
+/* Events */
+#define event Soul(address indexed, address indexed, uint indexed, string);
+
+/* Errors */
+#define error PanicError(uint256)
+
+#define macro PANIC() = takes (1) returns (0) {
+    // Input stack:          [panic_code]
+    __ERROR(PanicError)   // [panic_error_selector, panic_code]
+    0x00 mstore           // [panic_code]
+    0x04 mstore           // []
+    0x24 0x00 revert
+}
+
 /* Methods */
+#define macro TOKEN_EXISTS() = takes (2) returns (1) {
+    // Input stack: [address, tokenId]
+    [OWNER_LOCATION] LOAD_ELEMENT_FROM_KEYS(0x00)   // [owner]
+    0x00 iszero                                     // [doesNotExist]
+    not                                             // [exists]
+}
+
+
 #define macro SET() = takes (0) returns (0) {
     0x04 calldataload   // [tkn]
     0x24 calldataload   // [id, tkn]
     0x44 calldataload   // [data, id, tkn]
+
+    // Check if the token exists
+    dup1 dup2           // [tkn, id, data, id, tkn]
+    TOKEN_EXISTS()      // [exists, data, id, tkn]
+    iszero              // [not_exists, data, id, tkn]
+    dup1 jumpi          // [not_exists, data, id, tkn]
+    0x00 dup1 revert    // []
+    success:
+
     [META_LOCATION]    // [ptr, data, id, tkn]
     sstore              // [id, tkn]
     // emit Soul(msg.sender, tkn, id, meta[tkn][id] = data)
+}
+
+#define macro GET() = takes (0) returns (0) {
+    // Load value from storage.
+    [META_LOCATION]   // [ptr]
+    sload                // [value]
+
+    // Store value in memory.
+    0x00 mstore
+
+    // Return value
+    0x20 0x00 return
 }
 
 /// @notice Given two keys (ie a slot and a key), hash them together, generating a slot for a secondary hashmap.
@@ -116,15 +160,12 @@
     // Identify which function is being called.
     0x00 calldataload 0xE0 shr
     dup1 __FUNC_SIG(set) eq set jumpi
-    dup1 __FUNC_SIG(ownerOf) eq owner jumpi
-    dup1 __FUNC_SIG(balanceOf) eq balance jumpi
+    dup1 __FUNC_SIG(get) eq get jumpi
 
     0x00 0x00 revert
 
     set:
         SET()
-    owner:
-        OWNER_OF()
-    balance:
-        BALANCE_OF()
+    get:
+        GET()
 }

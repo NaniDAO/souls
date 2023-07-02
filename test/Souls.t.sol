@@ -10,7 +10,7 @@ import {MockERC1155} from "@solmate/test/utils/mocks/MockERC1155.sol";
 contract SoulsTest is Test {
     using stdStorage for StdStorage;
 
-    event Soul(address indexed _address, uint256 indexed _tokenId, string _data);
+    event Soul(address indexed _setter, address indexed _address, uint256 indexed _tokenId, string _data);
 
     error NotOwner();
 
@@ -33,7 +33,7 @@ contract SoulsTest is Test {
 
         // Set the soul of the token
         vm.expectEmit(true, true, true, true);
-        emit Soul(address(erc721), tokenId, soulData);
+        emit Soul(alice, address(erc721), tokenId, soulData);
         vm.prank(alice);
         souls.set(address(erc721), tokenId, soulData, TokenStandard.ERC721);
 
@@ -48,7 +48,7 @@ contract SoulsTest is Test {
 
         // Attempt to set the soul of the token with incorrect owner
         vm.expectRevert(NotOwner.selector);
-        emit Soul(address(erc721), tokenId, soulData);
+        emit Soul(alice, address(erc721), tokenId, soulData);
         vm.prank(alice);
         souls.set(address(erc721), tokenId, soulData, TokenStandard.ERC721);
     }
@@ -60,7 +60,7 @@ contract SoulsTest is Test {
         // Set the soul of the token
 
         vm.expectEmit(true, true, true, true);
-        emit Soul(address(erc1155), tokenId, soulData);
+        emit Soul(alice, address(erc1155), tokenId, soulData);
         vm.prank(alice);
         souls.set(address(erc1155), tokenId, soulData, TokenStandard.ERC1155);
 
@@ -76,7 +76,7 @@ contract SoulsTest is Test {
 
         // Attempt to set the soul of the token with incorrect owner
         vm.expectRevert(NotOwner.selector);
-        emit Soul(address(erc1155), tokenId, soulData);
+        emit Soul(alice, address(erc1155), tokenId, soulData);
         vm.prank(alice);
         souls.set(address(erc1155), tokenId, soulData, TokenStandard.ERC1155);
     }
@@ -89,7 +89,7 @@ contract SoulsTest is Test {
 
         // Attempt to set the soul of the non-existent token
         vm.expectRevert();
-        emit Soul(fake721, tokenId, soulData);
+        emit Soul(alice, fake721, tokenId, soulData);
         vm.prank(alice);
         souls.set(fake721, tokenId, soulData, TokenStandard.ERC721);
     }
@@ -101,7 +101,7 @@ contract SoulsTest is Test {
 
         // Attempt to set the soul of the non-existent token
         vm.expectRevert();
-        emit Soul(fake1155, tokenId, soulData);
+        emit Soul(alice, fake1155, tokenId, soulData);
         vm.prank(alice);
         souls.set(fake1155, tokenId, soulData, TokenStandard.ERC1155);
     }

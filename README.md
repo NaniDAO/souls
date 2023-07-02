@@ -1,6 +1,6 @@
 <img align="right" width="150" height="150" top="100" src="./assets/logo.webp">
 
-# Souls • [![ci](https://github.com/NaniDAO/souls/actions/workflows/ci.yml/badge.svg)](https://github.com/NaniDAO/souls/actions/workflows/ci.yml) ![license](https://img.shields.io/github/license/NaniDAO/souls?label=license) ![solidity](https://img.shields.io/badge/solidity-^0.8.4-lightgrey)
+# Souls • [![ci](https://github.com/NaniDAO/souls/actions/workflows/ci.yml/badge.svg)](https://github.com/NaniDAO/souls/actions/workflows/ci.yml) ![license](https://img.shields.io/github/license/NaniDAO/souls?label=license) ![solidity](https://img.shields.io/badge/solidity-^0.8.19-lightgrey)
 
 A contract for managing "souls" associated with NFTs.
 

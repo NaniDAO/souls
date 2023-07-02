@@ -13,7 +13,6 @@ contract SoulsTest is Test {
     event Soul(address indexed _address, uint256 indexed _tokenId, string _data);
 
     error NotOwner();
-    error InvalidStandard();
 
     Souls souls;
     MockERC721 erc721;

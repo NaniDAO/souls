@@ -25,11 +25,6 @@ contract Souls {
     error NotOwner();
 
     /**
-     * @dev Custom error thrown when an invalid standard is provided
-     */
-    error InvalidStandard();
-
-    /**
      * @dev Mapping to store metadata for each token
      */
     mapping(address => mapping(uint256 => string)) public metadata;
@@ -42,10 +37,6 @@ contract Souls {
      * @param _standard The standard of the token (721 for ERC721, 1155 for ERC1155)
      */
     function set(address _address, uint256 _tokenId, string memory _data, TokenStandard _standard) external {
-        if (_standard != TokenStandard.ERC721 && _standard != TokenStandard.ERC1155) {
-            revert InvalidStandard();
-        }
-
         if (_standard == TokenStandard.ERC721) {
             if (ERC721(_address).ownerOf(_tokenId) != msg.sender) revert NotOwner();
         } else if (_standard == TokenStandard.ERC1155) {

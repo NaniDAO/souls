@@ -26,7 +26,7 @@ contract Souls {
     /**
      * @dev Event emitted when a soul is set
      */
-    event Soul(address indexed _address, uint256 indexed _tokenId, string _data);
+    event Soul(address indexed _setter, address indexed _address, uint256 indexed _tokenId, string _data);
 
     /**
      * @dev Custom error thrown when the caller is not the owner of the token
@@ -54,6 +54,6 @@ contract Souls {
 
         metadata[_address][_tokenId] = _data;
 
-        emit Soul(_address, _tokenId, _data);
+        emit Soul(msg.sender, _address, _tokenId, _data);
     }
 }

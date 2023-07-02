@@ -1,12 +1,21 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 pragma solidity ^0.8.15;
 
-import {ERC721} from "@base/tokens/ERC721/ERC721.sol";
-import {ERC1155} from "@base/tokens/ERC1155/ERC1155.sol";
-
 enum TokenStandard {
     ERC721,
     ERC1155
+}
+
+abstract contract ERC721 {
+    mapping(uint256 => address) internal _ownerOf;
+
+    function ownerOf(uint256 id) public view virtual returns (address owner) {
+        require((owner = _ownerOf[id]) != address(0), "NOT_MINTED");
+    }
+}
+
+abstract contract ERC1155 {
+    mapping(address => mapping(uint256 => uint256)) public balanceOf;
 }
 
 /**

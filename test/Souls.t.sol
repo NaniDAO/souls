@@ -2,7 +2,7 @@
 pragma solidity ^0.8.15;
 
 import "@std/Test.sol";
-import {Souls,TokenStandard} from "src/Souls.sol";
+import {Souls, TokenStandard} from "src/Souls.sol";
 
 import {MockERC721} from "@solmate/test/utils/mocks/MockERC721.sol";
 import {MockERC1155} from "@solmate/test/utils/mocks/MockERC1155.sol";
@@ -17,8 +17,8 @@ contract SoulsTest is Test {
     Souls souls;
     MockERC721 erc721;
     MockERC1155 erc1155;
-    
-    address  alice = makeAddr("alice");
+
+    address alice = makeAddr("alice");
     address bob = makeAddr("bob");
 
     function setUp() external {
@@ -52,14 +52,13 @@ contract SoulsTest is Test {
         vm.prank(alice);
         souls.set(address(erc721), tokenId, soulData, TokenStandard.ERC721);
     }
-    
 
     // Test setting the soul for an ERC1155 token
     function testSetSoulERC1155(uint256 tokenId, string memory soulData) external {
         // Assume the caller owns the ERC1155 token
         erc1155.mint(alice, tokenId, 1, "");
         // Set the soul of the token
-        
+
         vm.expectEmit(true, true, true, true);
         emit Soul(address(erc1155), tokenId, soulData);
         vm.prank(alice);
@@ -81,12 +80,12 @@ contract SoulsTest is Test {
         vm.prank(alice);
         souls.set(address(erc1155), tokenId, soulData, TokenStandard.ERC1155);
     }
-    
+
     // Test setting the soul with an invalid token standard
-    
+
     // Test setting the soul for a non-existent ERC721 token
     function testSetSoulNonExistentERC721(uint256 tokenId, string memory soulData) external {
-        address fake721 = makeAddr("fake721"); 
+        address fake721 = makeAddr("fake721");
 
         // Attempt to set the soul of the non-existent token
         vm.expectRevert();

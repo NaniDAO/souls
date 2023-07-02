@@ -1,0 +1,130 @@
+/* Interface */
+#define function set(address, uint256, string) nonpayable returns ()
+#define function ownerOf(uint256) view returns (address)
+#define function balanceOf(address,uint256) view returns (uint256)
+
+/* Storage Slots */
+#define constant META_LOCATION = FREE_STORAGE_POINTER()
+#define constant OWNER_LOCATION = FREE_STORAGE_POINTER()
+#define constant BALANCE_LOCATION = FREE_STORAGE_POINTER()
+
+/* Methods */
+#define macro SET() = takes (0) returns (0) {
+    0x04 calldataload   // [tkn]
+    0x24 calldataload   // [id, tkn]
+    0x44 calldataload   // [data, id, tkn]
+    [META_LOCATION]    // [ptr, data, id, tkn]
+    sstore              // [id, tkn]
+    // emit Soul(msg.sender, tkn, id, meta[tkn][id] = data)
+}
+
+/// @notice Given two keys (ie a slot and a key), hash them together, generating a slot for a secondary hashmap.
+#define macro GET_SLOT_FROM_KEYS(mem_ptr) = takes(2) returns (1) {
+    // Input stack: [slot, key]
+    // Load the data into memory.
+    <mem_ptr> 0x20 add  // [<mem_ptr> + 32, slot, key]
+    mstore              // [key]
+    <mem_ptr>           // [<mem_ptr>, key]
+    mstore              // []
+
+    // Hash the data, generating a slot.
+    0x40        // [64]
+    <mem_ptr>   // [<mem_ptr>, 64]
+    sha3        // [slot]
+}
+
+/// @notice Load an element onto the stack from two keys
+#define macro LOAD_ELEMENT_FROM_KEYS(mem_ptr) = takes(2) returns(1) {
+    // Input stack: [key1, key2]
+    GET_SLOT_FROM_KEYS(<mem_ptr>)   // [slot]
+    sload                           // [value]
+}
+
+/// @notice Owner Of
+/// @notice Returns the owner of the given token id
+#define macro OWNER_OF() = takes (0) returns (0) {
+    0x04 calldataload                               // [tokenId]
+    [OWNER_LOCATION] LOAD_ELEMENT_FROM_KEYS(0x00)   // [owner]
+    0x00 mstore                                     // []
+    0x20 0x00 return                                // []
+}
+
+/// @notice Calculate the slot from two keys
+#define macro GET_SLOT_FROM_KEYS_2D(mem_ptr) = takes(3) returns (1) {
+    // Input stack: [slot, key1, key2]
+    // Load the data into memory
+    <mem_ptr> 0x20 add  // [<mem_ptr> + 32, slot, key1, key2]
+    mstore              // [key1, key2]
+
+    // next byte
+    <mem_ptr>           // [<mem_ptr>, key1, key2]
+    mstore              // [key2]
+
+    0x40                // [0x40, key2]
+    <mem_ptr>           // [<mem_ptr>, 0x40, key2]
+    sha3                // [hash, key2]
+
+    // concat the two keys
+    <mem_ptr> 0x20 add  // [<mem_ptr> + 32, hash, key2] put hash in memory
+    mstore              // [key2]
+
+    // next byte
+    <mem_ptr>           // [<mem_ptr>, key2]
+    mstore              // []
+
+    // Hash the data, generating a slot.
+    0x40                // [0x40]
+    <mem_ptr>           // [<mem_ptr>, 0x40]
+    sha3                // [slot]
+}
+
+
+/// @notice Load an element onto the stack from a slot and two keys
+#define macro LOAD_ELEMENT_FROM_KEYS_2D(mem_ptr) = takes(3) returns(1) {
+    // Input stack: [slot, key1, key2]
+    GET_SLOT_FROM_KEYS_2D(<mem_ptr>) // [slot]
+    sload                            // [value]
+}
+
+/// @title Get Balance Of
+/// @notice Get the balance of a token for a given account.
+/// @dev Uses LOAD_ELEMENT_FROM_KEYS_2D under the hood to perform a nested mapping lookup
+/// @param {stack} [account, tokenId]
+/// @return {stack} [balance]
+#define macro GET_BALANCE_OF() = takes (2) returns (1) {
+    // input stack: [account, tokenId]
+    [BALANCE_LOCATION]                              // [BALANCE_LOCATION, account, tokenId]
+    LOAD_ELEMENT_FROM_KEYS_2D(0x00)                 // [balance]
+}
+
+
+/// @title Balance Of
+/// @notice Entry point for: balaceOf(address,uint256)
+/// @dev Slices account and address from calldata and retreives the balance
+/// @param {calldata} [address account, uint256 tokenId]
+/// @return {return} [uint256 balance]
+#define macro BALANCE_OF() = takes (0) returns(0) {
+    0x24 calldataload                               // [tokenId]
+    0x04 calldataload                               // [account, tokenId]
+
+    GET_BALANCE_OF()                                // [balance]
+    0x00 mstore                                     // [] store into mem
+    0x20 0x00 return                                // [] return 32 bytes
+}
+
+#define macro MAIN() = takes (0) returns (0) {
+    // Identify which function is being called.
+    0x00 calldataload 0xE0 shr
+    dup1 __FUNC_SIG(set) eq set jumpi
+    dup1 __FUNC_SIG(ownerOf) eq owner jumpi
+    dup1 __FUNC_SIG(balanceOf) eq balance jumpi
+
+    0x00 0x00 revert
+
+    set:
+        SET()
+    owner:
+        OWNER_OF()
+    balance:
+        BALANCE_OF()
+}

@@ -12,7 +12,7 @@ contract Souls {
     mapping(Souls tkn => mapping(uint id => string)) public meta;
 
     function set(Souls tkn, uint id, string calldata data) external payable {
-        try  tkn.ownerOf(id) returns (address owner) {
+        try tkn.ownerOf(id) returns (address owner) {
             if (msg.sender != owner) revert NotOwner();
         } catch {
             if (tkn.balanceOf(msg.sender, id) == 0) revert NotOwner();
@@ -22,6 +22,6 @@ contract Souls {
     }
 
     /// @dev External mapping helpers.
-    mapping(uint256 => address) public ownerOf;
-    mapping(address => mapping(uint256 => uint256)) public balanceOf;
+    mapping(uint256 => address) internal ownerOf;
+    mapping(address => mapping(uint256 => uint256)) internal balanceOf;
 }

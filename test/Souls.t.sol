@@ -6,6 +6,7 @@ import {Souls} from "src/Souls.sol";
 
 import {MockERC721} from "@solmate/test/utils/mocks/MockERC721.sol";
 import {MockERC1155} from "@solmate/test/utils/mocks/MockERC1155.sol";
+import "forge-std/console.sol";
 
 contract SoulsTest is Test {
     using stdStorage for StdStorage;

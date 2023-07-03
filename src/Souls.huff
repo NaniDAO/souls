@@ -1,171 +1,136 @@
-/* Interface */
-#define function set(address, uint256, string) nonpayable returns ()
-#define function get(address, uint256) nonpayable returns (string)
-#define function ownerOf(uint256) view returns (address)
-#define function balanceOf(address,uint256) view returns (uint256)
+/// @title Souls
+/// @author Shivanshi Tyagi
+/// @license Apache License, Version 2.0
 
-/* Storage Slots */
-#define constant META_LOCATION = FREE_STORAGE_POINTER()
-#define constant OWNER_LOCATION = FREE_STORAGE_POINTER()
-#define constant BALANCE_LOCATION = FREE_STORAGE_POINTER()
+/* Imports */
+#include "@huffmate/data-structures/Hashmap.huff"
+#include "@huffmate/utils/CommonErrors.huff"
+
+/* Interface */
+#define function set721(address, uint256, string) nonpayable returns ()
+#define function set1155(address, uint256, string) nonpayable returns ()
+#define function get(address, uint256) nonpayable returns (string memory)
 
 /* Events */
-#define event Soul(address indexed, address indexed, uint indexed, string);
+#define event Soul(address indexed user, address indexed contract, uint256 indexed tokenId, string data)
 
-/* Errors */
-#define error PanicError(uint256)
+/* Event Signatures */
+#define constant SOUL_SIG = 0x88a3e3992df0b2e8056f93a6e513b007e6156dedafc21013ed8728bf09d29adc // keccak256("Soul(address,address,uint256,string)")
 
-#define macro PANIC() = takes (1) returns (0) {
-    // Input stack:          [panic_code]
-    __ERROR(PanicError)   // [panic_error_selector, panic_code]
-    0x00 mstore           // [panic_code]
-    0x04 mstore           // []
-    0x24 0x00 revert
+/* MAPPINGS */
+#define constant SOUL_DATA_LOCATION = FREE_STORAGE_POINTER()
+
+/// @notice Only Owner Modifier
+#define macro ONLY_OWNER_MODIFIER() = takes (0) returns (0) {
+    [OWNER_SLOT] sload                      // [owner]
+    caller eq authed jumpi                  // []
+    ONLY_OWNER(0x00)                        // []
+    authed:                                 // []
 }
 
-/* Methods */
-#define macro TOKEN_EXISTS() = takes (2) returns (1) {
-    // Input stack: [address, tokenId]
-    [OWNER_LOCATION] LOAD_ELEMENT_FROM_KEYS(0x00)   // [owner]
-    0x00 iszero                                     // [doesNotExist]
-    not                                             // [exists]
+/* Set ERC1155 Soul Data */
+#define macro SET_ERC1155() = takes (3) returns () { // takes contract address, tokenId, and soul data to be stored
+    // 1155 fork
+    // we call balanceOf, if less than 0, we revert, otherwise we set value and then return 
+
+    return
 }
 
+/* Set ERC721 Soul Data */
+#define macro SET_ERC721() = takes (3) returns () { // takes contract address, tokenId, and soul data to be stored
+    // 721 fork
+    // we call ownerOf, if not ownerOf, we revert, otherwise we set value and then retur
+     
+    // Store the ownerOf function selector in memory to call
+    // __FUNC_SIG(ownerOf)    // [sig_right_padded]
+    // 0xE0 shl               // [sig_left_padded]
+    // 0x20 mstore            // []
 
-#define macro SET() = takes (0) returns (0) {
-    0x04 calldataload   // [tkn]
-    0x24 calldataload   // [id, tkn]
-    0x44 calldataload   // [data, id, tkn]
+    // // Call the asset to get its owner
+    // 0x20                   // [retSize]
+    // 0x00                   // [retOffset, retSize]
+    // 0x04                   // [argSize, retOffset, retSize]
+    // 0x20                   // [argOffset, argSize, retOffset, retSize]
 
-    // Check if the token exists
-    dup1 dup2           // [tkn, id, data, id, tkn]
-    TOKEN_EXISTS()      // [exists, data, id, tkn]
-    iszero              // [not_exists, data, id, tkn]
-    dup1 jumpi          // [not_exists, data, id, tkn]
-    0x00 dup1 revert    // []
-    success:
+    // 0x04 calldataload      // [contractAddress]
+    // 0x00 mstore            // store contractAddress at memory location 0x00
+    // 0x00 mload             // [to, argOffset, argSize, retOffset, retSize]
 
-    [META_LOCATION]    // [ptr, data, id, tkn]
-    sstore              // [id, tkn]
-    // emit Soul(msg.sender, tkn, id, meta[tkn][id] = data)
+    // gas                    // [gas, to, argOffset, argSize, retOffset, retSize]
+    // staticcall             // [success]
+
+    // // If the call failed, revert
+    // cont jumpi             // []
+    // 0x00 dup1 revert       // []
+    // cont:
+
+    // // Load the owner
+    // 0x00 mload             // [owner]
+    
+    // // Compare owner in memory with caller
+    // caller eq not revert jumpi // []
+
+    // Call SET_SOUL_DATA
+    // what is the stack at this point?  
+    // 0x44 calldataload                              
+    // 0x24 calldataload 
+    // 0x04 calldataload          
+    //SET_SOUL_DATA() // []
+    return
 }
 
-#define macro GET() = takes (0) returns (0) {
-    // Load value from storage.
-    [META_LOCATION]   // [ptr]
-    sload                // [value]
-
-    // Store value in memory.
-    0x00 mstore
-
-    // Return value
-    0x20 0x00 return
+/* Set Soul Data */
+#define macro SET_SOUL_DATA() = takes(3) returns () {
+    // input stack: [contractAddress, tokenId, data] 
+    [SOUL_DATA_LOCATION] // [slot, contractAddress, tokenId, data]
+    STORE_ELEMENT_FROM_KEYS_2D(0x00)
+    stop
 }
 
-/// @notice Given two keys (ie a slot and a key), hash them together, generating a slot for a secondary hashmap.
-#define macro GET_SLOT_FROM_KEYS(mem_ptr) = takes(2) returns (1) {
-    // Input stack: [slot, key]
-    // Load the data into memory.
-    <mem_ptr> 0x20 add  // [<mem_ptr> + 32, slot, key]
-    mstore              // [key]
-    <mem_ptr>           // [<mem_ptr>, key]
-    mstore              // []
+// Viewable Function Macros
 
-    // Hash the data, generating a slot.
-    0x40        // [64]
-    <mem_ptr>   // [<mem_ptr>, 64]
-    sha3        // [slot]
-}
-
-/// @notice Load an element onto the stack from two keys
-#define macro LOAD_ELEMENT_FROM_KEYS(mem_ptr) = takes(2) returns(1) {
-    // Input stack: [key1, key2]
-    GET_SLOT_FROM_KEYS(<mem_ptr>)   // [slot]
-    sload                           // [value]
-}
-
-/// @notice Owner Of
-/// @notice Returns the owner of the given token id
-#define macro OWNER_OF() = takes (0) returns (0) {
-    0x04 calldataload                               // [tokenId]
-    [OWNER_LOCATION] LOAD_ELEMENT_FROM_KEYS(0x00)   // [owner]
-    0x00 mstore                                     // []
-    0x20 0x00 return                                // []
-}
-
-/// @notice Calculate the slot from two keys
-#define macro GET_SLOT_FROM_KEYS_2D(mem_ptr) = takes(3) returns (1) {
-    // Input stack: [slot, key1, key2]
-    // Load the data into memory
-    <mem_ptr> 0x20 add  // [<mem_ptr> + 32, slot, key1, key2]
-    mstore              // [key1, key2]
-
-    // next byte
-    <mem_ptr>           // [<mem_ptr>, key1, key2]
-    mstore              // [key2]
-
-    0x40                // [0x40, key2]
-    <mem_ptr>           // [<mem_ptr>, 0x40, key2]
-    sha3                // [hash, key2]
-
-    // concat the two keys
-    <mem_ptr> 0x20 add  // [<mem_ptr> + 32, hash, key2] put hash in memory
-    mstore              // [key2]
-
-    // next byte
-    <mem_ptr>           // [<mem_ptr>, key2]
-    mstore              // []
-
-    // Hash the data, generating a slot.
-    0x40                // [0x40]
-    <mem_ptr>           // [<mem_ptr>, 0x40]
-    sha3                // [slot]
-}
-
-
-/// @notice Load an element onto the stack from a slot and two keys
-#define macro LOAD_ELEMENT_FROM_KEYS_2D(mem_ptr) = takes(3) returns(1) {
-    // Input stack: [slot, key1, key2]
-    GET_SLOT_FROM_KEYS_2D(<mem_ptr>) // [slot]
-    sload                            // [value]
-}
-
-/// @title Get Balance Of
-/// @notice Get the balance of a token for a given account.
-/// @dev Uses LOAD_ELEMENT_FROM_KEYS_2D under the hood to perform a nested mapping lookup
-/// @param {stack} [account, tokenId]
-/// @return {stack} [balance]
-#define macro GET_BALANCE_OF() = takes (2) returns (1) {
-    // input stack: [account, tokenId]
-    [BALANCE_LOCATION]                              // [BALANCE_LOCATION, account, tokenId]
-    LOAD_ELEMENT_FROM_KEYS_2D(0x00)                 // [balance]
-}
-
-
-/// @title Balance Of
-/// @notice Entry point for: balaceOf(address,uint256)
-/// @dev Slices account and address from calldata and retreives the balance
+/* Retrieve Soul Data */
+/// @title GET
+/// @notice Entry point for: get(address,uint256)
+/// @dev Slices account and address from calldata and retrieves the soul data
 /// @param {calldata} [address account, uint256 tokenId]
-/// @return {return} [uint256 balance]
-#define macro BALANCE_OF() = takes (0) returns(0) {
+/// @return {return} [string memory soulData]
+#define macro GET() = takes (2) returns (1) { // takes contract address and tokenId
     0x24 calldataload                               // [tokenId]
-    0x04 calldataload                               // [account, tokenId]
+    0x04 calldataload                               // [contractAddress, tokenId]
 
-    GET_BALANCE_OF()                                // [balance]
+    GET_SOUL_DATA()                                 // [soulData]
     0x00 mstore                                     // [] store into mem
     0x20 0x00 return                                // [] return 32 bytes
 }
 
-#define macro MAIN() = takes (0) returns (0) {
-    // Identify which function is being called.
-    0x00 calldataload 0xE0 shr
-    dup1 __FUNC_SIG(set) eq set jumpi
+/* Retrieve Soul Data */
+/// @title Get Soul Data
+/// @notice Get the soul data of a token for a given contractAddress.
+/// @dev Uses LOAD_ELEMENT_FROM_KEYS_2D under the hood to perform a nested mapping lookup
+/// @param {stack} [contractAddress, tokenId]
+/// @return {stack} [soulData]
+#define macro GET_SOUL_DATA() = takes (2) returns (1) {
+    // input stack: [contractAddress, tokenId]
+    [SOUL_DATA_LOCATION]                            // [SOUL_DATA_LOCATION, contractAddress, tokenId]
+    LOAD_ELEMENT_FROM_KEYS_2D(0x00)                 // [soulData]
+}
+
+/* Main Macro - The contract entrypoint */
+#define macro MAIN() = takes(0) returns (0) {
+    // Identify which function is being called using the 4 byte function signature
+    0x00 calldataload 0xe0 shr
+    dup1 __FUNC_SIG(set721) eq set721 jumpi
+    dup1 __FUNC_SIG(set1155) eq set1155 jumpi
     dup1 __FUNC_SIG(get) eq get jumpi
 
+    // Revert if no signatures match
     0x00 0x00 revert
-
-    set:
-        SET()
+    
+    set721:
+      SET_ERC721()
+    set1155:
+      SET_ERC1155()
     get:
-        GET()
+      GET()
 }

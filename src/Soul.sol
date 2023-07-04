@@ -1,12 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 pragma solidity 0.8.20;
 
-/// @title  Soul
-/// @author NaN1
-/// @notice more
-///         meta
-///         data
-
 contract Soul {
     event Set(address indexed usr, Tkn indexed tkn, uint indexed id, string data);
 
@@ -26,6 +20,6 @@ contract Soul {
 }
 
 abstract contract Tkn {
-    function ownerOf(uint) public returns (address) {}
-    function balanceOf(address, uint) public returns (uint) {}
+    function ownerOf(uint) public view returns (address) {}
+    function balanceOf(address, uint) public view returns (uint) {}
 }

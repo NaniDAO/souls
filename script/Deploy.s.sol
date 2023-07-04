@@ -1,16 +1,16 @@
 // SPDX-License-Identifier: AGPL-3.0-only
-pragma solidity ^0.8.15;
+pragma solidity 0.8.20;
 
-import {Script} from "forge-std/Script.sol";
-import {Souls} from "src/Souls.sol";
+import 'forge-std/Script.sol';
+import 'src/Soul.sol';
 
-/// @notice A very simple deployment script
+/// @notice A very simple deployment script.
 contract Deploy is Script {
-    /// @notice The main script entrypoint
-    /// @return souls The deployed contract
-    function run() external returns (Souls souls) {
+    /// @notice The main script entrypoint.
+    /// @return soul The deployed contract.
+    function run() public returns (Soul soul) {
         vm.startBroadcast();
-        souls = new Souls();
+        soul = new Soul();
         vm.stopBroadcast();
     }
 }

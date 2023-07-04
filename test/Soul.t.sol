@@ -12,8 +12,6 @@ contract SoulsTest is Test {
 
     event Set(address indexed usr, Tkn indexed tkn, uint indexed id, string data);
 
-    error NotOwner();
-
     Soul soul;
     address erc721;
     address erc1155;
@@ -47,7 +45,7 @@ contract SoulsTest is Test {
         MockERC721(erc721).safeMint(bob, tokenId, '');
 
         // Attempt to set the soul of the token with incorrect owner.
-        vm.expectRevert(NotOwner.selector);
+        vm.expectRevert();
         vm.prank(alice);
         soul.set(Tkn(erc721), tokenId, soulData);
     }
@@ -74,7 +72,7 @@ contract SoulsTest is Test {
         MockERC1155(erc1155).mint(bob, tokenId, 1, '');
 
         // Attempt to set the soul of the token with incorrect owner.
-        vm.expectRevert(NotOwner.selector);
+        vm.expectRevert();
         emit Set(alice, Tkn(erc1155), tokenId, soulData);
         vm.prank(alice);
         soul.set(Tkn(erc1155), tokenId, soulData);

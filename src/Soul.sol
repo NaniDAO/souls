@@ -8,9 +8,9 @@ contract Soul {
 
     function set(Tkn tkn, uint id, string calldata data) external payable {
         try tkn.ownerOf(id) returns (address owner) {
-            if (msg.sender != owner) revert("Not 721 Owner");
+            if (msg.sender != owner) revert('Not 721 Owner');
         } catch {
-            if (tkn.balanceOf(msg.sender, id) == 0) revert("Not 1155 Owner");
+            if (tkn.balanceOf(msg.sender, id) == 0) revert('Not 1155 Owner');
         }
 
         emit Set(msg.sender, tkn, id, meta[tkn][id] = data);

@@ -17,7 +17,7 @@ contract Soul {
     }
 }
 
-abstract contract Tkn {
-    function ownerOf(uint) external view returns (address) {}
-    function balanceOf(address, uint) external view returns (uint) {}
+interface Tkn {
+    function ownerOf(uint) external view returns (address);
+    function balanceOf(address, uint) external view returns (uint);
 }

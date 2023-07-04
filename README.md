@@ -11,12 +11,11 @@ A contract for managing "souls" associated with NFTs.
 ```ml
 lib
 ├─ forge-std — https://github.com/foundry-rs/forge-std
-├─ solbase — https://github.com/Sol-DAO/solbase
-└─ solmate — https://github.com/Rari-Capital/solmate
+└─ solbase — https://github.com/Sol-DAO/solbase
 scripts
 ├─ Deploy.s.sol — Simple Deployment Script
 src
-└─ Souls.sol — Contains the logic for read and write the "soul" associated with NFT. 
+└─ Souls.sol — Contains logic for reading and writing "soul" associated with NFT
 test
 └─ Souls.t — Exhaustive Tests
 ```

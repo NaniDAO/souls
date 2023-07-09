@@ -4,23 +4,22 @@ pragma solidity 0.8.20;
 import 'forge-std/Test.sol';
 import {Soul, Tkn} from 'src/Soul.sol';
 
-import {MockERC721} from 'lib/solbase/test/utils/mocks/MockERC721.sol';
-import {MockERC1155} from 'lib/solbase/test/utils/mocks/MockERC1155.sol';
+import {MockERC721} from './mocks/MockERC721.sol';
+import {MockERC1155} from './mocks/MockERC1155.sol';
 
 contract SoulsTest is Test {
     using stdStorage for StdStorage;
 
     event Set(address indexed usr, Tkn indexed tkn, uint indexed id, string data);
 
-    Soul soul;
+    Soul immutable soul = new Soul();
     address erc721;
     address erc1155;
 
     address alice = makeAddr('alice');
     address bob = makeAddr('bob');
 
-    function setUp() external payable {
-        soul = new Soul();
+    function setUp() public payable {
         erc721 = address(new MockERC721("Soul", "SOUL")); // Mock ERC721 contract.
         erc1155 = address(new MockERC1155()); // Mock ERC1155 contract.
     }
